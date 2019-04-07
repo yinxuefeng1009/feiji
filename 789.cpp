@@ -1,33 +1,106 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <conio.h>
+
+int position_x,position_y; 
+int bullet_x,bullet_y; 
+int enemy_x,enemy_y; 
+int high,width;
+int score; 
+
+void startup() 
+{
+	high = 20;
+	width = 30;
+	position_x = high/2;
+	position_y = width/2;
+	bullet_x = -2;
+	bullet_y = position_y;
+	enemy_x = 0;
+	enemy_y = position_y;
+	score = 0;
+}
+
+void show()  
+{
+	system("cls");   
+	int i,j;
+	for (i=0;i<high;i++)
+	{
+		for (j=0;j<width;j++)
+		{
+			if ((i==position_x) && (j==position_y))
+				printf("*");  
+			else if ((i==enemy_x) && (j==enemy_y))
+				printf("@");  
+			else if ((i==bullet_x) && (j==bullet_y))
+				printf("|");  
+			else
+				printf(" ");  
+		}
+		printf("\n");
+	}
+	printf("得分：%d\n",score);
+}	
+
+void updateWithoutInput()  
+{	
+	if (bullet_x>-1)
+		bullet_x--; 
+
+	if ((bullet_x==enemy_x) && (bullet_y==enemy_y))  
+	{
+		score++;                
+		enemy_x = -1;           
+		enemy_y = rand()%width;
+		bullet_x = -2;          
+	}
+	if (enemy_x>high)   
+	{
+		enemy_x = -1;           
+		enemy_y = rand()%width;
+	}
+
+	static int speed = 0;  
+	if (speed<10)
+		speed++;
+	if (speed == 10)
+	{
+		enemy_x++;			
+		speed = 0;
+	}
+}
+
+void updateWithInput()  
+{
+	char input;
+	if(kbhit())  
+	{
+		input = getch();  
+		if (input == 'a')   
+			position_y--;  
+		if (input == 'd')
+			position_y++;  
+		if (input == 'w')
+			position_x--;  
+		if (input == 's')
+			position_x++;  
+		if (input == ' ')  
+		{
+			bullet_x = position_x-1;  
+			bullet_y = position_y;
+		}
+		
+	}
+}
 
 void main()
 {
-	int i,j;
-	int x = 5;
-	int y = 10;
-	
-	int hight = 20;
-	int velocity = 1;
-	
-	while (1)
+	startup();  	
+	while (1) 
 	{
-		x=x+velocity;
-		system("cls");   // 清屏函数
-		
-		// 输出小球前的空行
-		for(i=0;i<x;i++)
-			printf("\n");
-		for (j=0;j<y;j++)
-			printf(" ");
-		printf("o");  // 输出小球o
-		printf("\n"); 
-		
-		if (x==hight)
-			velocity = -velocity;
-		if (x==0)
-		{
-			velocity = -velocity;
-		}		
-	}	
+		show();  
+		updateWithoutInput();  
+		updateWithInput();  
+	}
 }
